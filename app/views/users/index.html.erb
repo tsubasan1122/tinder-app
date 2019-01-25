@@ -1,20 +1,20 @@
 <div class="topPage">
   <nav class="nav">
     <ul>
-      <li class="personIcon"><%= link_to(content_tag(:i, "", class: "fas fa-2x fa-user"), user_path(current_user.id)) %></li>
-      <li class="appIcon"><%= link_to image_tag("techpit-march-icon.png"), action: "index" %></li>
+      <li class="personIcon"><%= link_to(content_tag(:i, "", class: 'fas fa-2x fa-user'), user_path(current_user.id)) %></li>
+      <li class="appIcon"><%= link_to image_tag("techpit-march-icon.png"), users_path %></li>
     </ul>
   </nav>
   <div id="tinderslide">
     <ul>
-      <%= @users.each do |user| %>
-        <li data-user_id="user.id">
+      <% @users.each do |user| %>
+        <li data-user_id="<%= user.id %>">
           <div class="userName"><%= user.name %></div>
           <%= image_tag user.img_name.url(:thumb) %>
           <div class="like"></div>
           <div class="dislike"></div>
         </li>
-     <% end %>
+      <% end %>
     </ul>
     <div class="noUser">近くにお相手がいません。</div>
   </div>
@@ -24,9 +24,56 @@
   </div>
 </div>
 <script type="text/javascript" charset="utf-8">
-  $("#tinderslide").jTinder();
+  var usersNum = <%= @users.length %>
+  var currentUserIndex = 0;
+  var postReaction = function (user_id, reaction) {
+    $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+      }
+    });
+    $.ajax({
+      type: "POST",
+      url: "<%= reactions_path %>",
+      data: {
+        user_id: user_id,
+        reaction: reaction,
+      },
+      success: function(j_data){
+        console.log("success")
+      }
+    });
+  }
+  $("#tinderslide").jTinder({
+    onDislike: function (item) {
+      currentUserIndex++;
+      checkUserNum();
+      var user_id = item[0].dataset.user_id
+      postReaction(user_id, 'dislike')
+    },
+    onLike: function (item) {
+      currentUserIndex++;
+      checkUserNum();
+      var user_id = item[0].dataset.user_id
+      postReaction(user_id, 'like')
+    },
+    animationRevertSpeed: 200,
+    animationSpeed: 400,
+    threshold: 1,
+    likeSelector: '.like',
+    dislikeSelector: '.dislike'
+  });
   $('.actions .like, .actions .dislike').click(function(e){
     e.preventDefault();
     $("#tinderslide").jTinder($(this).attr('class'));
   });
+
+  function checkUserNum() {
+    // スワイプするユーザー数とスワイプした回数が同じになればaddClassする
+    if (currentUserIndex === usersNum){
+      $(".noUser").addClass("is-active");
+      $("#actionBtnArea").addClass("is-none")
+      return;
+    }
+  }
 </script>
