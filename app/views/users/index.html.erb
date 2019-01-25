@@ -3,6 +3,7 @@
     <ul>
       <li class="personIcon"><%= link_to(content_tag(:i, "", class: 'fas fa-2x fa-user'), user_path(current_user.id)) %></li>
       <li class="appIcon"><%= link_to image_tag("techpit-march-icon.png"), users_path %></li>
+      <li class="messageIcon"><%= link_to(content_tag(:i, "", class: 'fas fa-2x fa-comments'),matching_index_path) %></li>
     </ul>
   </nav>
   <div id="tinderslide">
