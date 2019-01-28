@@ -12,6 +12,10 @@
           <div class="matchingPerson">
             <div class="matchingPerson_img"><%= image_tag user.img_name.url(:thumb) %></div>
             <div class="matchingPerson_name"><%= user.name %></div>
+            <%= form_tag :chat_index, method: :post do %>
+              <input type="hidden" name="user_id" value="<%= user.id %>" />
+              <%= submit_tag 'チャットを開く', class: "chatForm_btn" %>
+            <% end %>
           </div>
         <% end %>
       </div>
